@@ -5,6 +5,8 @@ Search, evaluate a purchase, and assign the next step in one place.
 
 German interface · Next.js / TypeScript · shadcn/ui · SQLite by default · ISC license
 
+![Autoraum vehicle search with filters and source status in a local workspace](docs/images/vehicle-search.png)
+
 ## Start locally
 
 Requires **Node.js 24+**, npm, Git and curl on macOS or Linux (Windows: WSL2).
