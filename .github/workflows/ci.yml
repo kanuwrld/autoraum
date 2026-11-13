@@ -19,7 +19,8 @@ env:
 
 jobs:
   application:
-    runs-on: ubuntu-latest
+    # Pin the OS so runner image updates do not break browser dependencies.
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -40,7 +41,7 @@ jobs:
       - run: npm run test:e2e
 
   postgres:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -54,7 +55,7 @@ jobs:
       - run: npm run test:postgres
 
   secrets:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
