@@ -7,19 +7,29 @@ German interface · Next.js / TypeScript · shadcn/ui · SQLite by default · IS
 
 ## Start locally
 
-Requires **Node.js 24**, npm, and macOS or Linux. Use WSL2 on Windows.
-No domain, cloud account, paid service, or marketplace account is required to run the app.
+Requires **Node.js 24+**, npm, Git and curl on macOS or Linux (Windows: WSL2).
+Allow about 2 GB of free disk space for dependencies and the first build.
+No domain, cloud account, paid service, or marketplace account is required.
+
+**Install and start with one command:**
 
 ```sh
-git clone https://github.com/kanuwrld/autoraum.git
-cd autoraum
-npm ci
-npm run setup
-npm run build
-npm run local:service -- start
+curl -fsSL https://raw.githubusercontent.com/kanuwrld/autoraum/main/install.sh | bash
 ```
 
-Open **[localhost:3000](http://localhost:3000)**. Read your generated login details
+The [installer](install.sh) clones the public code into `~/autoraum`; it never overwrites
+an unrelated directory. Review the script before running downloaded code. It installs
+locked dependencies, generates private credentials, builds the app and starts web + worker.
+
+**Already cloned the repository?** Run this from its directory:
+
+```sh
+npm run local
+```
+
+Open the URL printed by the launcher, usually **[localhost:3000](http://localhost:3000)**.
+A new installation automatically chooses a free port between 3000 and 3020. Use
+`npm run local -- --port 3181` to choose a different port on first setup. Read your generated login details
 in `.local/access.txt` on your own machine; never commit or share this file.
 
 - **Workspace owner:** search, import your inventory, manage purchases and team tasks.
@@ -35,7 +45,9 @@ npm run local:service -- stop
 # Start again after a reboot; the local supervisor is not an OS startup service.
 ```
 
-Change `APP_URL` in `.env.local` if port 3000 is occupied, then restart the service.
+Repeated `npm run local` preserves your data and credentials and reuses unchanged dependencies
+and builds. After changing source code or `.env.local`, run it again to rebuild/restart as needed.
+To move an existing installation, change `APP_URL` in `.env.local` first.
 Both the web app and background worker run under the local supervisor.
 The computer must remain awake for scheduled searches to run.
 
@@ -59,10 +71,20 @@ There are no seeded vehicles, bundled customer accounts, email delivery, payment
 An empty [CSV header template](public/import-template.csv) is included.
 You can also connect a supplier feed with a per-source token.
 
-Public-page adapters are included for **AutoScout24, Kleinanzeigen, PKW.de, Autohero,
-markt.de, Quoka and auto.de**. They are **off by default**. To enable them on an installation
-with appropriate source permissions, set `PUBLIC_MARKETPLACE_SEARCH=1` in `.env.local`
-and run `npm run local:service -- restart`.
+**Search works immediately after a new installation:** the public-page adapters for
+**AutoScout24, Kleinanzeigen, PKW.de, Autohero, markt.de, Quoka and auto.de** are enabled.
+Sign in, choose your filters and click `Jetzt suchen`. No account, API key or cookie from
+the project author is used. Each installation makes requests from its own machine.
+
+An older installation's explicit setting is preserved. To enable its public sources:
+
+```sh
+npm run local -- --enable-public-search
+```
+
+To opt out, set `PUBLIC_MARKETPLACE_SEARCH=0` in `.env.local` and run `npm run local` again.
+Enabled means the adapter will be tried; it does not promise that every source is reachable
+or has matching vehicles. Source terms and permissions still apply.
 
 The **mobile.de Search API** adapter needs separately obtained credentials. No credentials
 or marketplace sessions are bundled. The code license does not grant rights to third-party
@@ -73,7 +95,8 @@ errors, partial results and cached data. See [Data sources](docs/DATA_SOURCES.md
 
 - `.env.local`, databases, passwords, backups, logs and test output are ignored by Git.
 - Setup disables optional Next.js telemetry. There is no application telemetry or hosted control plane.
-- The operator controls the database. Marketplace requests and listing images still contact third parties when used.
+- The operator controls the database. Marketplace requests and listing images contact third parties from that user's own network.
+- The launcher ignores unrelated application credentials inherited from the shell; only this installation's `.env.local` supplies app configuration. There is no author-owned gateway or shared account.
 - This repository contains code and synthetic tests, not a working installation's data.
 
 Read [Privacy](docs/PRIVACY.md) before sharing logs, screenshots or a fork.
@@ -103,7 +126,8 @@ npm run test:e2e
 ```
 
 `npm run test:postgres` runs the contract suite against a disposable PostgreSQL 17 Docker container.
-GitHub Actions checks lint, types, tests, production build, browser flows and publication hygiene.
+GitHub Actions checks lint, types, tests, production build, browser flows, publication hygiene
+and a clean one-command installation with no preinstalled project dependencies.
 Gitleaks checks the Git history for secrets. No runtime credentials are needed by CI.
 
 ## Self-hosting and backups

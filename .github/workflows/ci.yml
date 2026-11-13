@@ -73,3 +73,38 @@ jobs:
           echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  gitleaks.tar.gz" | sha256sum --check
           tar -xzf gitleaks.tar.gz gitleaks
           ./gitleaks git "$GITHUB_WORKSPACE" --redact --no-banner
+
+  bootstrap:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      APP_URL: https://unrelated.example.test
+      DATABASE_URL: postgresql://ignored@example.test/database
+      ADMIN_NAME: SHELL_ONLY
+      ADMIN_EMAIL: ignored@example.test
+      MOBILE_API_USERNAME: SHELL_ONLY
+      MOBILE_API_PASSWORD: SHELL_ONLY
+      DATA_ENCRYPTION_KEY: SHELL_ONLY
+      CRON_SECRET: SHELL_ONLY
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Install from a clean checkout using one command
+        run: |
+          test ! -d node_modules
+          bash -n install.sh
+          bash install.sh "$PWD" --port 3181
+      - run: python3 tests/local-smoke.py
+      - name: Stop test services
+        if: always()
+        env:
+          APP_URL: http://localhost:3181
+        run: |
+          if [ -f .env.local ] && [ -d node_modules/tsx ]; then
+            npm run local:service -- stop
+          fi

@@ -1,6 +1,7 @@
 # Data sources
 
-Autoraum starts with no listings and no external credentials. Adapter availability
+Autoraum starts with no saved listings and no external credentials. New installations enable
+all seven public adapters automatically; the first search fetches available vehicles. Adapter availability
 means the code exists; it is not a guarantee of live access, coverage or permission.
 
 | Source                                     | How it works                                                                           | Default                                  |
@@ -8,17 +9,20 @@ means the code exists; it is not a guarantee of live access, coverage or permiss
 | CSV                                        | Upload inventory through `Daten importieren`; use `public/import-template.csv`         | Available, empty                         |
 | Supplier feeds                             | A supplier sends normalized JSON to `/api/ingest` with a scoped bearer token           | Requires configuration and data delivery |
 | mobile.de                                  | Official Search API, using server-side operator credentials or workspace configuration | Disconnected                             |
-| AutoScout24, Kleinanzeigen                 | Public page parsing                                                                    | Disabled                                 |
-| PKW.de, Autohero, markt.de, Quoka, auto.de | Public page/JSON adapters                                                              | Disabled                                 |
+| AutoScout24, Kleinanzeigen                 | Public page parsing                                                                    | Enabled, checked on search               |
+| PKW.de, Autohero, markt.de, Quoka, auto.de | Public page/JSON adapters                                                              | Enabled, checked on search               |
 
 ## Public adapters
 
-Set `PUBLIC_MARKETPLACE_SEARCH=1` in `.env.local` and restart web and worker to opt in.
+New installations set `PUBLIC_MARKETPLACE_SEARCH=1` automatically. Older explicit settings
+are preserved: run `npm run local -- --enable-public-search` to enable an existing installation.
+Set `PUBLIC_MARKETPLACE_SEARCH=0` in `.env.local` and run `npm run local` to opt out.
 Use only sources and data you have permission to access and reuse. The ISC code license
 does not cover marketplace content or photos. No login cookies, browser profiles,
 personal marketplace accounts or proxy services are included.
 
-Requests run on the installation's server. Equivalent requests share a five-minute
+Requests run directly on the installation's server, using that operator's network. No author
+account, cookie, proxy, central gateway or shared credential is involved. Equivalent requests share a five-minute
 cache across workspaces; shared leases limit concurrency to two requests per source.
 Fetches have a 25-second deadline, response size limits and one- or two-page caps.
 Sources enter a cooldown after blocks or rate limits. The app does not bypass login walls

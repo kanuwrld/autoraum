@@ -2,7 +2,14 @@
 
 ## Local installation
 
-Use the README quick start. `npm run setup` creates `.env.local` with random secrets
+Use the README one-command installer, or `npm run local` inside a clone. Node.js 24+ is required;
+allow about 2 GB for dependencies and the first build. A fresh launcher chooses a free loopback
+port between 3000 and 3020, installs the lockfile, runs setup/build and starts the supervisor.
+Repeating the command preserves data, keys and passwords; unchanged installs/builds are reused.
+A startup lock prevents concurrent initialization. No global application environment variables
+are imported: configure this installation through its own `.env.local`.
+
+`npm run setup` creates `.env.local` with random secrets
 and `.local/access.txt` with random initial passwords. It never seeds vehicle listings.
 Set `ADMIN_EMAIL` / `ADMIN_NAME` before the first setup if you want custom admin identifiers;
 email addresses are login identifiers, not a configured email delivery service.
@@ -12,8 +19,13 @@ local Node supervisor. It restarts crashed child processes with bounded backoff.
 Use `status`, `restart` or `stop` to manage it. Process state and logs live in `.local/`.
 It requires `ps` on macOS/Linux and must be started again after an OS reboot.
 
+An existing `PUBLIC_MARKETPLACE_SEARCH=0` is preserved. To enable it explicitly, run
+`npm run local -- --enable-public-search`. The launcher ignores unrelated shell credentials,
+including `DATABASE_URL`, mobile.de access, admin identity and `NEXT_PUBLIC_*` variables.
+A PostgreSQL configuration in this installation's file requires the advanced server commands below.
+
 Do not run two supervisors against the same directory. Do not run `next dev` on a port
-already used by the production server. Restart after changing `.env.local`.
+already used by the production server. Run `npm run local` after changing `.env.local`.
 
 ## Configuration
 
@@ -25,7 +37,7 @@ already used by the production server. Restart after changing `.env.local`.
 | `DATABASE_URL`                               | Optional PostgreSQL connection; replaces SQLite when present         |
 | `DATA_ENCRYPTION_KEY`                        | 64 hexadecimal characters for stored integration credentials         |
 | `CRON_SECRET`                                | At least 32 characters; protects optional `/api/cron` calls          |
-| `PUBLIC_MARKETPLACE_SEARCH`                  | `0` by default; set `1` only to opt in to public adapters            |
+| `PUBLIC_MARKETPLACE_SEARCH`                  | `1` on new installations; set `0` to disable public adapters         |
 | `MOBILE_API_USERNAME`, `MOBILE_API_PASSWORD` | Optional operator-provided mobile.de Search API credentials          |
 | `NEXT_TELEMETRY_DISABLED=1`                  | Opts out of optional Next.js telemetry                               |
 
@@ -62,10 +74,7 @@ not a full database backup or an implemented JSON restore path.
 npm run backup -- create
 npm run local:service -- stop
 git pull --ff-only
-npm ci
-npm run db:migrate
-npm run build
-npm run local:service -- start
+npm run local
 ```
 
 Review release changes first. Do not overwrite `.env.local` or run a destructive migration

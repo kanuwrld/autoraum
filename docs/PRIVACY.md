@@ -18,19 +18,24 @@ Examples and tests use synthetic records and reserved example addresses.
 
 ## What leaves the machine
 
-| Action                         | Network traffic                                                                  |
-| ------------------------------ | -------------------------------------------------------------------------------- |
-| Install dependencies           | npm registry / dependency download hosts                                         |
-| Use only local inventory       | Browser communicates with this installation                                      |
-| Enable public source search    | Server sends search filters and its network IP to the selected platforms         |
-| Configure mobile.de            | Server sends queries and the configured API credentials to mobile.de             |
-| View an external listing photo | Browser requests the image from its host; the host sees the browser's network IP |
-| Open an original listing       | Browser navigates to that platform                                               |
-| Supplier ingestion             | Supplier sends data to the installation's authenticated ingestion endpoint       |
+| Action                                     | Network traffic                                                                  |
+| ------------------------------------------ | -------------------------------------------------------------------------------- |
+| Install dependencies                       | npm registry / dependency download hosts                                         |
+| Use only local inventory                   | Browser communicates with this installation                                      |
+| Search public sources (enabled by default) | Server sends search filters and its network IP to the selected platforms         |
+| Configure mobile.de                        | Server sends queries and the configured API credentials to mobile.de             |
+| View an external listing photo             | Browser requests the image from its host; the host sees the browser's network IP |
+| Open an original listing                   | Browser navigates to that platform                                               |
+| Supplier ingestion                         | Supplier sends data to the installation's authenticated ingestion endpoint       |
 
 There is no application analytics, automatic email, remote error reporting or hosted control plane.
 Setup writes `NEXT_TELEMETRY_DISABLED=1`, the [documented Next.js opt-out](https://nextjs.org/telemetry).
 Browser notifications require permission and an open tab; no third-party push service is used.
+
+Each installation generates independent credentials and a separate database. The one-command
+launcher ignores unrelated application credentials inherited from the shell; it reads only
+its own `.env.local`. No runtime request goes through the project author's accounts or server.
+GitHub is contacted to download the code; npm is contacted to download dependencies.
 
 Self-hosting and using no personal marketplace account **does not make network traffic anonymous**.
 The network providing the installation is visible to data sources. Host on infrastructure you control

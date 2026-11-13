@@ -23,7 +23,7 @@ const defaults = {
   DATABASE_URL: "",
   SQLITE_PATH: ".local/autoraum.sqlite",
   ALLOW_LOCAL_DB: "1",
-  PUBLIC_MARKETPLACE_SEARCH: "0",
+  PUBLIC_MARKETPLACE_SEARCH: "1",
   NEXT_TELEMETRY_DISABLED: "1",
   DATA_ENCRYPTION_KEY: randomBytes(32).toString("hex"),
   CRON_SECRET: randomBytes(32).toString("hex"),

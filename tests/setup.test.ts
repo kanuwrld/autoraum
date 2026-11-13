@@ -57,7 +57,7 @@ test("fresh setup creates private unique credentials and an empty workspace; rer
     assert.match(env.DATA_ENCRYPTION_KEY || "", /^[a-f0-9]{64}$/);
     assert.match(env.CRON_SECRET || "", /^[a-f0-9]{64}$/);
     assert.notEqual(env.DATA_ENCRYPTION_KEY, env.CRON_SECRET);
-    assert.equal(env.PUBLIC_MARKETPLACE_SEARCH, "0");
+    assert.equal(env.PUBLIC_MARKETPLACE_SEARCH, "1");
     assert.equal(env.NEXT_TELEMETRY_DISABLED, "1");
     assert.equal(statSync(envPath).mode & 0o777, 0o600);
     assert.equal(statSync(join(directory, ".local")).mode & 0o777, 0o700);
@@ -114,13 +114,13 @@ test("setup completes a copied environment template while preserving operator se
   try {
     const template = readFileSync(join(root, ".env.example"), "utf8")
       .replace("APP_URL=http://localhost:3000", "APP_URL=http://localhost:3987")
-      .replace("PUBLIC_MARKETPLACE_SEARCH=0", "PUBLIC_MARKETPLACE_SEARCH=1")
+      .replace("PUBLIC_MARKETPLACE_SEARCH=1", "PUBLIC_MARKETPLACE_SEARCH=0")
       .replace("DATA_ENCRYPTION_KEY=", `DATA_ENCRYPTION_KEY=${"a".repeat(64)}`);
     writeFileSync(join(directory, ".env.local"), template);
     setup(directory);
     const env = parseEnv(readFileSync(join(directory, ".env.local"), "utf8"));
     assert.equal(env.APP_URL, "http://localhost:3987");
-    assert.equal(env.PUBLIC_MARKETPLACE_SEARCH, "1");
+    assert.equal(env.PUBLIC_MARKETPLACE_SEARCH, "0");
     assert.equal(env.DATA_ENCRYPTION_KEY, "a".repeat(64));
     assert.match(env.CRON_SECRET || "", /^[a-f0-9]{64}$/);
     assert.equal(
